@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "mari"
+version = "0.1.0"
+description = "Mari is a content-aware, distributed archiving service"
+authors = ["Nic Anderson <nic@nic-a.net>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "mari"}]
+
+[tool.poetry.scripts]
+# check = 'mari.cli:resource_check'
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+celery = {extras = ["auth", "libredditmq", "redis"], version = "^5.3.6"}
+yt-dlp = "^2023.11.16"
+gallery-dl = "^1.26.4"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+isort = "^5.12.0"
+pytest = "^7.4.2"
+flake8 = "^6.1.0"
+flake8-pyproject = "^1.2.3"
+coverage = "^7.3.2"
+
+[tool.flake8]
+max-line-length = 100
+count = true
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+src_paths = ["mari", "tests"]
+line_length = 100
+known_first_party = ["mari"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.tox]
+# 3.11 as current, 3.12 as future
+legacy_tox_ini = """
+    [tox]
+    isolated_build = true
+    env_list =
+        py311
+        py312
+
+    [testenv]
+    skip_install = true
+    allowlist_externals = poetry
+    commands_pre = 
+        poetry install
+    commands =
+        poetry run coverage run -m pytest tests/ --import-mode importlib
+        poetry run coverage xml
+"""
